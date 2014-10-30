@@ -31,7 +31,7 @@ class plugin_info
     static $PLUGIN_CODE       = 'plg_spike_checkout';
     static $PLUGIN_NAME       = 'SPIKE Checkoutクレジットカード決済';
     static $CLASS_NAME        = 'SC_Plg_Spike_Checkout';
-    static $PLUGIN_VERSION    = '1.2';
+    static $PLUGIN_VERSION    = '1.1';
     static $COMPLIANT_VERSION = '2.13.0,2.12.0';
     static $AUTHOR            = 'SPIKE';
     static $DESCRIPTION       = 'SPIKE Checkoutを用いたクレジットカード決済が利用可能です。';
