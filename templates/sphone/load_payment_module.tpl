@@ -22,7 +22,7 @@
 
   <h2 class="title"><!--{$tpl_title|h}--></h2>
 
-  <form name="form1" id="form1" method="POST" action="<!--{$tpl_url|h}-->" autocomplete="off">
+  <form name="form1" id="cc_spike_checkout_924b54ffcd5affe53bb2970853cf2105616426f1" method="POST" action="<!--{$tpl_url|h}-->" autocomplete="off">
     <input type="hidden" name="<!--{$smarty.const.TRANSACTION_ID_NAME}-->" value="<!--{$transactionid}-->" />
     <input type="hidden" name="mode" value="charge" />
     <input type="hidden" name="token" id="token" value="" />
@@ -44,7 +44,7 @@
         key: '<!--{$tpl_api_public_key}-->',
         token: function(token, args) {
             $(':input[type="hidden"][name="token"]').val(token.id);
-            $('form').submit();
+            $('form#cc_spike_checkout_924b54ffcd5affe53bb2970853cf2105616426f1').submit();
         }
     });
 
