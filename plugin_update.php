@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * SPIKE CheckoutプラグインChargeヘルパーEXクラス
+ * プラグインをアップデートする際にフックされる
  *
  * @package spike
  * @author Metaps, Inc.
@@ -53,6 +53,8 @@ class plugin_update
     $objQuery->commit();
 
     // 変更ファイルの上書き
+    // v1.0から現在の最新までに更新されたファイルを列挙しておく必要があるので
+    // 消してはいけない。
     $files = array(
       '/templates/default/load_payment_module.tpl',
       '/templates/sphone/load_payment_module.tpl',
