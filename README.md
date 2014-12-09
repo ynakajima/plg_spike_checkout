@@ -25,7 +25,9 @@ plg_spike_checkout
   - 5.3.*
   - 5.4.*
   - 5.5.*
-  - REST APIの呼び出しにはHTTPSを使用します。PHPにてHTTPSでの通信ができることが必須です。
+- PHP設定要件
+  - `--with-openssl`オプション付きでconfigureされていること。
+  - `allow_url_fopen`が1に設定されていること。
 - 対応端末
   - o PC、スマートフォン
   - x フィーチャーフォン
