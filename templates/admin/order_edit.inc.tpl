@@ -102,11 +102,12 @@
 <h3>SPIKE Checkoutクレジットカード決済 決済ログ</h3>
 <table class="form" id="plg_spike_checkout_form">
   <tr>
-    <th>決済日時</th>
+    <th style="width: 120px;">決済日時</th>
     <th style="width: 80px;">取引状態</th>
-    <th>決済金額</th>
+    <th style="width: 70px;">決済金額</th>
     <th>課金オブジェクトID</th>
-    <th>取消日時</th>
+    <th style="width: 100px;">決済接続環境</th>
+    <th style="width: 120px;">取消日時</th>
   </tr>
   <!--{foreach from=$arrSpikeChargeLogs item=arrSpikeChargeLog name=spikeChargeLog}-->
   <tr>
@@ -118,8 +119,15 @@
         取消済み
       <!--{/if}-->
     </td>
-    <td><!--{$arrSpikeChargeLog.amount|number_format|h}-->円</td>
+    <td style="text-align: right;"><!--{$arrSpikeChargeLog.amount|number_format|h}-->円</td>
     <td><!--{$arrSpikeChargeLog.id|h}--></td>
+    <td>
+      <!--{if $arrSpikeCharge.livemode}-->
+        本番環境
+      <!--{else}-->
+        サンドボックス環境
+      <!--{/if}-->
+    </td>
     <td>
       <!--{if $arrSpikeChargeLog.refunded}-->
         <!--{$arrSpikeChargeLog.refunds[0].created|date_format:"%Y/%m/%d %H:%M:%S"}-->
