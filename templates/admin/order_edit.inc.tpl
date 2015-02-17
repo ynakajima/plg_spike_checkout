@@ -93,7 +93,7 @@
       <!--{if $is_spike_payment_status_captured}-->
         <a class="btn-normal" href="javascript:void(0);" onclick="fnPlgSpikeCheckoutConfirm('plg_spike_checkout_cancel','','');">決済取消</a>&nbsp;
       <!--{else}-->
-        --
+        <a class="btn-normal" href="javascript:void(0);" onclick="fnPlgSpikeCheckoutConfirm('plg_spike_checkout_charge','','');">現在のお支払い合計金額（<!--{$arrSpikeOrder.payment_total|default:0|number_format|h}-->円）で再決済</a>&nbsp;
       <!--{/if}-->
     </td>
   </tr>
