@@ -60,6 +60,17 @@ class SC_Plg_Spike_Checkout_Helper_Charge
     }
 
     /**
+     * SPIKE Checkout課金情報取得APIのエンドポイントを返す
+     *
+     * @param $charge_object_id 課金オブジェクトID
+     * @return mixed エンドポイントURL
+     */
+    public function getChargeDataApiEndpoint($charge_object_id)
+    {
+        return str_replace('{CHARGE_ID}', $charge_object_id, PLG_SPIKE_CHECKOUT_ENDPOINT_CHARGE_DATA);
+    }
+
+    /**
      * SPIKE Checkout課金作成APIへリクエストを送信する
      *
      * @param $arrData 送信するPOSTデータ
@@ -105,6 +116,34 @@ class SC_Plg_Spike_Checkout_Helper_Charge
         $arrOptions = array('http' => array(
             'method' => 'POST',
             'content' => "\r\n", // Set empty contents.
+            'header' => implode("\r\n", $arrHeaders),
+            'ignore_errors' => true,
+        ));
+
+        $contents = file_get_contents($url, false, stream_context_create($arrOptions));
+        if (empty($contents)) {
+            return false;
+        }
+
+        return json_decode($contents, true);
+    }
+
+    /**
+     * SPIKE Checkout課金情報取得APIへリクエストを送信する
+     *
+     * @param $charge_object_id 課金オブジェクトID
+     * @param $secret_key API呼び出し用の秘密鍵
+     * @return bool|mixed 失敗時: false、成功時: レスポンスをJSONエンコードしたオブジェクト
+     */
+    public function sendChargeDataRequest($charge_object_id, $secret_key)
+    {
+        $url = $this->getChargeDataApiEndpoint($charge_object_id);
+        $arrHeaders = array(
+            'User-Agent: ' . $this->getPluginUserAgent(),
+            'Authorization: Basic ' . base64_encode("${secret_key}:"),
+        );
+        $arrOptions = array('http' => array(
+            'method' => 'GET',
             'header' => implode("\r\n", $arrHeaders),
             'ignore_errors' => true,
         ));

@@ -107,6 +107,12 @@ class SC_Plg_Spike_Checkout extends SC_Plugin_Base
                 $objHook->prepareAdminOrderEditDisplay($objPage);
                 break;
 
+            case 'plg_spike_checkout_sync':
+                $objHook = new SC_Plg_Spike_Checkout_Helper_Hook_Ex();
+                $objHook->performSyncChargeData($objPage);
+                $objHook->prepareAdminOrderEditDisplay($objPage);
+                break;
+
             default:
                 break;
         }

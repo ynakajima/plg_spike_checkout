@@ -215,4 +215,95 @@ class SC_Plg_Spike_Checkout_Helper_Hook
         $objPurchase->sfUpdateOrderStatus($order_id, null, null, null, $sqlval);
         $objQuery->commit();
     }
+
+    /**
+     * 決算情報同期処理
+     *
+     * @param LC_Page_Ex $objPage
+     */
+    public function performSyncChargeData(LC_Page_Ex $objPage)
+    {
+        $objFormParam = new SC_FormParam_Ex();
+        $objFormParam->addParam('注文番号', 'order_id');
+        $objFormParam->addParam('支払方法', 'payment_id');
+        $objFormParam->setParam($_REQUEST);
+
+        $order_id = $objFormParam->getValue('order_id');
+        $payment_id = $objFormParam->getValue('payment_id');
+
+        $arrPayment = SC_Helper_Payment_Ex::get($payment_id);
+        $objPage->is_spike_checkout = $arrPayment['memo03'] == PLG_SPIKE_CHECKOUT_MODULE_CODE;
+
+        if (SC_Utils_Ex::isBlank($order_id) || ! $objPage->is_spike_checkout) {
+            return;
+        }
+
+        $objHelper = new SC_Plg_Spike_Checkout_Helper_Plugin_Ex();
+        $arrConfig = $objHelper->getConfig();
+        $secret_key = $arrConfig['api_secret_key'];
+
+        $objPurchase = new SC_Helper_Purchase_Ex();
+        $arrOrder = $objPurchase->getOrder($order_id);
+
+        $arrSpikeCharge = unserialize($arrOrder[PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT]);
+
+        $arrSpikeChargeLogs = unserialize($arrOrder[PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT_LOGS]);
+        if (!is_array($arrSpikeChargeLogs)) {
+            $arrSpikeChargeLogs = array();
+        } else {
+            $isContainCurrentCharge = false;
+            foreach($arrSpikeChargeLogs as $arrSpikeChargeLog) {
+                if ($arrSpikeChargeLog['id'] === $arrSpikeCharge['id']) {
+                    $isContainCurrentCharge = true;
+                    break;
+                }
+            }
+            if (!$isContainCurrentCharge) {
+                array_push($arrSpikeChargeLogs, $arrSpikeCharge);
+            }
+        }
+
+        foreach($arrSpikeChargeLogs as $index => $arrSpikeChargeLog) {
+            $arrResponse = array();
+            $charge_object_id = $arrSpikeChargeLog['id'];
+
+            try {
+                $objCharge = new SC_Plg_Spike_Checkout_Helper_Charge_Ex();
+                $arrResponse = $objCharge->sendChargeDataRequest($charge_object_id, $secret_key);
+                if (empty($arrResponse) || empty($arrResponse['id'])) {
+                    $error_message = '同期に失敗しました。';
+                    if (! empty($arrResponse['error'])) {
+                        $error_message .= sprintf("(TYPE: %s, MESSAGE: %s)", $arrResponse['error']['type'], $arrResponse['error']['message']);
+                    }
+                    $objPage->spike_checkout_error = $error_message;
+                    return;
+                }
+            } catch (Exception $objException) {
+                $objPage->spike_checkout_error = '同期に失敗しました。';
+                return;
+            }
+
+            if ($arrSpikeCharge['id'] === $charge_object_id) {
+                $arrSpikeCharge = $arrResponse;
+            }
+            $arrSpikeChargeLogs[$index] = $arrResponse;
+        }
+
+        $paymentStatus = PLG_SPIKE_CHECKOUT_PAYMENT_STATUS_UNSETTLED;
+        if ($arrSpikeCharge['paid']) {
+            $paymentStatus = PLG_SPIKE_CHECKOUT_PAYMENT_STATUS_CAPTURED;
+        } else if($arrSpikeCharge['refunded']) {
+            $paymentStatus = PLG_SPIKE_CHECKOUT_PAYMENT_STATUS_CANCELED;
+        }
+
+        $objQuery = SC_Query_Ex::getSingletonInstance();
+        $objQuery->begin();
+        $sqlval = array(
+            PLG_SPIKE_CHECKOUT_ORDER_COL_PAYMENT_STATUS => $paymentStatus,
+            PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT => serialize($arrSpikeCharge),
+            PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT_LOGS => serialize($arrSpikeChargeLogs)
+        );
+        $objPurchase->sfUpdateOrderStatus($order_id, null, null, null, $sqlval);
+        $objQuery->commit();
+    }
 }

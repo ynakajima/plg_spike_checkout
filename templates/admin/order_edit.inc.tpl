@@ -20,8 +20,11 @@
  *}-->
 <!--{if $is_spike_checkout}-->
 <script type="text/javascript"><!--
-  function fnPlgSpikeCheckoutConfirm(mode, anchor, anchor_name) {
-    if(window.confirm('決済操作を行います。\n受注データを編集していない場合は先に保存して下さい。\nよろしいですか？')) {
+  function fnPlgSpikeCheckoutConfirm(mode, anchor, anchor_name, mess) {
+    if (typeof mess !== 'string') {
+      mess = '決済操作を行います。\n受注データを編集していない場合は先に保存して下さい。\nよろしいですか？';
+    }
+    if(window.confirm(mess)) {
       fnModeSubmit(mode, anchor, anchor_name);
     }
   }
@@ -99,7 +102,7 @@
   </tr>
 </table>
 
-<h3>SPIKE Checkoutクレジットカード決済 決済ログ</h3>
+<h3>SPIKE Checkoutクレジットカード決済 決済ログ　<a class="btn-normal" href="javascript:void(0);" onclick="fnPlgSpikeCheckoutConfirm('plg_spike_checkout_sync','','', 'SPIKE側のダッシュボードで決算情報を修正した場合にのみご利用下さい。\n受注データを編集していない場合は先に保存して下さい。\nよろしいですか？');">SPIKE側の決算情報を反映</a></h3>
 <table class="form" id="plg_spike_checkout_form">
   <tr>
     <th style="width: 120px;">決済日時</th>
