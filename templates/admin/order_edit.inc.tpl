@@ -99,5 +99,38 @@
   </tr>
 </table>
 
+<h3>SPIKE Checkoutクレジットカード決済 決済ログ</h3>
+<table class="form" id="plg_spike_checkout_form">
+  <tr>
+    <th>決済日時</th>
+    <th style="width: 80px;">ステータス</th>
+    <th>決済金額</th>
+    <th>課金オブジェクトID</th>
+    <th>取消日時</th>
+  </tr>
+  <!--{foreach from=$arrSpikeChargeLogs item=arrSpikeChargeLog name=spikeChargeLog}-->
+  <tr>
+    <td><!--{$arrSpikeChargeLog.created|date_format:"%Y/%m/%d %H:%M:%S"}--></td>
+    <td style="width: 80px;">
+      <!--{if $arrSpikeChargeLog.paid && !$arrSpikeChargeLog.refunded}-->
+        実売り上げ
+      <!--{else}-->
+        取消済み
+      <!--{/if}-->
+    </td>
+    <td><!--{$arrSpikeChargeLog.amount|number_format|h}-->円</td>
+    <td><!--{$arrSpikeChargeLog.id|h}--></td>
+    <td>
+      <!--{if $arrSpikeChargeLog.refunded}-->
+        <!--{$arrSpikeChargeLog.refunds[0].created|date_format:"%Y/%m/%d %H:%M:%S"}-->
+      <!--{else}-->
+        --
+      <!--{/if}-->
+    </td>
+  </tr>
+  <!--{/foreach}-->
+</table>
+
+
 <h2>受注詳細</h2>
 <!--{/if}-->

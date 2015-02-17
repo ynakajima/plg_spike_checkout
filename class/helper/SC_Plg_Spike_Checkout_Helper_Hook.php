@@ -62,6 +62,9 @@ class SC_Plg_Spike_Checkout_Helper_Hook
             $arrOrder[PLG_SPIKE_CHECKOUT_ORDER_COL_PAYMENT_STATUS] == PLG_SPIKE_CHECKOUT_PAYMENT_STATUS_CANCELED;
 
         $objPage->arrSpikeCharge = unserialize($arrOrder[PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT]);
+
+        $arrSpikeChargeLogs = unserialize($arrOrder[PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT_LOGS]);
+        $objPage->arrSpikeChargeLogs = is_array($arrSpikeChargeLogs) ? $arrSpikeChargeLogs : array($objPage->arrSpikeCharge);
     }
 
     /**
@@ -112,11 +115,30 @@ class SC_Plg_Spike_Checkout_Helper_Hook
             return;
         }
 
+        // ログに追加
+        $arrSpikeChargeLogs = unserialize($arrOrder[PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT_LOGS]);
+        if (!is_array($arrSpikeChargeLogs)) {
+            $arrSpikeChargeLogs = array($arrResponse);
+        } else {
+            $logIndex = -1;
+            for($i = 0, $l = count($arrSpikeChargeLogs); $i < $l; $i++) {
+                if ($arrSpikeChargeLogs[$i]['id'] === $arrResponse['id']) {
+                    $arrSpikeChargeLogs[$i] = $arrResponse;
+                    $logIndex = $i;
+                    break;
+                }
+            }
+            if ($logIndx === -1) {
+                array_push($arrSpikeChargeLogs, $arrResponse);
+            }
+        }
+
         $objQuery = SC_Query_Ex::getSingletonInstance();
         $objQuery->begin();
         $sqlval = array(
             PLG_SPIKE_CHECKOUT_ORDER_COL_PAYMENT_STATUS => PLG_SPIKE_CHECKOUT_PAYMENT_STATUS_CANCELED,
             PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT => serialize($arrResponse),
+            PLG_SPIKE_CHECKOUT_ORDER_COL_CHARGE_OBJECT_LOGS => serialize($arrSpikeChargeLogs),
         );
         $objPurchase->sfUpdateOrderStatus($order_id, null, null, null, $sqlval);
         $objQuery->commit();
