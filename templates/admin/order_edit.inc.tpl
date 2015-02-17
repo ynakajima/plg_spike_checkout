@@ -103,7 +103,7 @@
 <table class="form" id="plg_spike_checkout_form">
   <tr>
     <th>決済日時</th>
-    <th style="width: 80px;">ステータス</th>
+    <th style="width: 80px;">取引状態</th>
     <th>決済金額</th>
     <th>課金オブジェクトID</th>
     <th>取消日時</th>
@@ -113,7 +113,7 @@
     <td><!--{$arrSpikeChargeLog.created|date_format:"%Y/%m/%d %H:%M:%S"}--></td>
     <td style="width: 80px;">
       <!--{if $arrSpikeChargeLog.paid && !$arrSpikeChargeLog.refunded}-->
-        実売り上げ
+        実売上済み
       <!--{else}-->
         取消済み
       <!--{/if}-->
