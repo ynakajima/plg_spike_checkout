@@ -181,7 +181,7 @@ class SC_Plg_Spike_Checkout_Helper_Hook
         $arrResponse = array();
 
         try {
-            $objCharge = new LC_Page_Mdl_Spike_Checkout_Payment();
+            $objCharge = new LC_Page_Mdl_Spike_Checkout_Payment_EX();
             $arrResponse = $objCharge->lfChargeBySpike($arrData, $arrOrder, $arrConfig);
             if (empty($arrResponse) || empty($arrResponse['id'])) {
                 $error_message = '再決済に失敗しました。';
